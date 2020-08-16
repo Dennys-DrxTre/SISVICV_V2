@@ -1,0 +1,328 @@
+{% extends "base/base.html" %}
+{% block title %}Inicio | Estadisticas{% endblock %}
+{% block contenido %}
+
+<div class="container-fluid">
+  <div class="row">
+    <!-- Donut Chart -->
+    <div class="col-xl-4 col-lg-5">
+      <div class="card shadow mb-4">
+        <!-- Card Header - Dropdown -->
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-success">Productos</h6>
+        </div>
+        <!-- Card Body -->
+        <div class="card-body">
+          <div class="chart-pie pt-6" >
+            <canvas id="pie-chart"></canvas>
+          </div>
+          <hr>
+          <code class="text-success h5">Grafico de 8 productos con menor cantidad en el inventario</code>
+        </div>
+      </div>
+    </div>
+
+    <!-- Area Chart -->
+      <div class="col-xl-8 col-lg-5">
+        <div class="card shadow mb-4">
+          <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-success">Ganancias Mensuales</h6>
+          </div>
+          <div class="card-body">
+            <div class="chart-area">
+              <canvas id="AreaChart" class="text-light"></canvas>
+            </div>
+            <hr>
+            <code class="text-success h5">Grafico de las ganancias por mes </code> 
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4">
+          <!-- Card Header - Dropdown -->
+          <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-success">Registros Medicos</h6>
+          </div>
+          <!-- Card Body -->
+          <div class="card-body">
+            <div class="chart-pie pt-6" >
+              <canvas id="DonutChart"></canvas>
+            </div>
+            <hr>
+            <code class="text-success h5">Grafico de la cantidad total de registros medicos realizados</code>
+          </div>
+        </div>
+      </div>
+
+   <!-- Bar Chart -->
+    <div class="col-xl-8 col-lg-5">
+      <div class="card shadow mb-4">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-success">Ventas Mensuales</h6>
+        </div>
+        <div class="card-body">
+          <div class="chart-bar">
+            <canvas id="BarChart"></canvas>
+          </div>
+          <hr>
+          <code class="text-success h5">Grafico de la cantidad de ventas por mes</code>
+        </div>
+      </div>
+    </div>
+  
+    </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script>
+      // DONUT CHART CANTIDAD DE PRODUCTOS CON MENOS STOCK 
+  var MyChartPie = {
+    type: 'pie',
+    data: {
+      datasets: [{
+        data: {{ data|safe}},
+        backgroundColor:['#17cf92', '#e47452', '#fbc560', '#3683ff', '#b80099', '#a50000', '#1ad439', '#26d5ec'],
+        label: 'Productos',
+      }],
+      labels: {{ labels|safe }}
+    },
+    options: {
+      maintainAspectRatio: false,
+      responsive: true,
+      legend: {
+        display: false
+      },
+      cutoutPercentage: 60,
+      tooltips: {
+        backgroundColor: "rgb(255,255,255)",
+        bodyFontColor: "#858796",
+        borderColor: '#dddfeb',
+        borderWidth: 1,
+        xPadding: 15,
+        yPadding: 15,
+        displayColors: false,
+        caretPadding: 10,
+      },
+    }
+  }
+
+  window.onload = function() {
+    var ctx = document.getElementById('pie-chart').getContext('2d');
+    window.myPie = new Chart(ctx, MyChartPie);
+  };
+
+</script>
+
+<script>
+    // LINE CHART GANANCIAS MENSUALES
+  var a = document.getElementById("AreaChart");
+  var myLineChart = new Chart(a, {
+    type: 'line',
+    data: {
+      labels: [
+        {% for i in ventas.all %}"{{ i.month|date:"M-Y"}}",{% endfor %}],
+      datasets: [{
+        label: "Ganancias",
+        lineTension: 0.3,
+        backgroundColor: "rgba(93, 214, 153, 0.1)",
+        borderColor: "rgba(38, 189, 101, 1)",
+        pointRadius: 4,
+        pointBackgroundColor: "rgba(38, 189, 101, 1)",
+        pointBorderColor: "rgba(38, 189, 101, 1)",
+        pointHoverRadius: 5,
+        pointHoverBackgroundColor: "rgba(36, 177, 95, 1)",
+        pointHoverBorderColor: "rgba(36, 177, 95, 1)",
+        pointHitRadius: 10,
+        pointBorderWidth: 2,
+        data: [
+          {% for i in ventas.all %}{{ i.ganancias|safe }},{% endfor %}],
+      }],
+    },
+    options: {
+      maintainAspectRatio: false,
+      layout: {
+        padding: {
+          left: 10,
+          right: 25,
+          top: 25,
+          bottom: 0
+        }
+      },
+      scales: {
+        xAxes: [{
+          time: {
+            unit: 'date'
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false
+          },
+          ticks: {
+            maxTicksLimit: 7
+          }
+        }],
+        yAxes: [{
+          ticks: {
+            maxTicksLimit: 5,
+            padding: 10,
+            // Include a dollar sign in the ticks
+            callback: function(value, index, values) {
+              return '$' + number_format(value);
+            }
+          },
+          gridLines: {
+            color: "rgb(234, 236, 244)",
+            zeroLineColor: "rgb(234, 236, 244)",
+            drawBorder: false,
+            borderDash: [2],
+            zeroLineBorderDash: [2]
+          }
+        }],
+      },
+      legend: {
+        display: false
+      },
+      tooltips: {
+        backgroundColor: "rgb(255,255,255)",
+        bodyFontColor: "#858796",
+        titleMarginBottom: 10,
+        titleFontColor: '#6e707e',
+        titleFontSize: 14,
+        borderColor: '#dddfeb',
+        borderWidth: 1,
+        xPadding: 15,
+        yPadding: 15,
+        displayColors: false,
+        intersect: false,
+        mode: 'index',
+        caretPadding: 10,
+        callbacks: {
+          label: function(tooltipItem, chart) {
+            var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
+            return datasetLabel + ': $' + number_format(tooltipItem.yLabel);
+          }
+        }
+      }
+    }
+  });
+
+</script>
+
+<script>
+    // BAR CHART DE CANTIDAD DE VENTAS MENSUALES
+  var ctx = document.getElementById("BarChart");
+  var myBarChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: [{% for c in cantidad.all %} "{{ c.month|date:"M-Y" }}", {% endfor %}],
+      datasets: [{
+        label: "Ventas",
+        backgroundColor: "#2bc76c",
+        hoverBackgroundColor: "#26b160",
+        borderColor: "#4e73df",
+        data: [{% for c in cantidad.all %} {{ c.cantidad|safe }}, {% endfor %}],
+      }],
+    },
+    options: {
+      maintainAspectRatio: false,
+      layout: {
+        padding: {
+          left: 10,
+          right: 25,
+          top: 25,
+          bottom: 0
+        }
+      },
+      scales: {
+        xAxes: [{
+          time: {
+            unit: 'month'
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false
+          },
+          ticks: {
+            maxTicksLimit: 12,
+          },
+          maxBarThickness: 25,
+        }],
+        yAxes: [{
+          ticks: {
+            maxTicksLimit: 12,
+            padding: 10,
+          },
+          gridLines: {
+            color: "rgb(234, 236, 244)",
+            zeroLineColor: "rgb(234, 236, 244)",
+            drawBorder: false,
+            borderDash: [2],
+            zeroLineBorderDash: [2]
+          }
+        }],
+      },
+      legend: {
+        display: false
+      },
+      tooltips: {
+        titleMarginBottom: 10,
+        titleFontColor: '#6e707e',
+        titleFontSize: 14,
+        backgroundColor: "rgb(255,255,255)",
+        bodyFontColor: "#858796",
+        borderColor: '#dddfeb',
+        borderWidth: 1,
+        xPadding: 15,
+        yPadding: 15,
+        displayColors: false,
+        caretPadding: 10,
+        callbacks: {
+          label: function(tooltipItem, chart) {
+            var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
+            return datasetLabel + ': ' + number_format(tooltipItem.yLabel);
+          }
+        }
+      },
+    }
+  });
+</script>
+
+<script>
+  // DONUT CHART DE CANTIDA TOTAL DE CONSULTAS, VACUNACIONES Y DESPARASITACIONES REGISTRADAS
+  var ctx = document.getElementById("DonutChart");
+  var myDonutChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: ["Consultas", "Desparasitaciones", "Vacunaciones"],
+      datasets: [{
+        data: [{{ c.id__count|safe }},{{ d.id__count|safe }}, {{ v.id__count|safe }}],
+        backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc'],
+        hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf'],
+        hoverBorderColor: "rgba(234, 236, 244, 1)",
+      }],
+    },
+    options: {
+      tooltips: {
+        backgroundColor: "rgb(255,255,255)",
+        bodyFontColor: "#858796",
+        borderColor: '#dddfeb',
+        borderWidth: 1,
+        xPadding: 15,
+        yPadding: 15,
+        displayColors: false,
+        caretPadding: 10,
+      },
+      legend: {
+        display: false
+      },
+      cutoutPercentage: 50,
+      maintainAspectRatio: false,
+      responsive: true
+    },
+  });
+
+</script>
+{% endblock %}

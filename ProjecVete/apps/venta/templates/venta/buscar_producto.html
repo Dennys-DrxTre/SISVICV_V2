@@ -1,0 +1,77 @@
+{% load static %}
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Productos</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="tblProducto" data-toggle="table" data-search="true" data-pagination="true">
+                        <thead>
+                            <th scope="col">Código</th>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Descripcion</th>
+                            <th scope="col">Departamento</th>
+                            <th scope="col">Precio de Venta</th>
+                            <th scope="col">Stock</th>
+                            <th scope="col">Opcción</th>
+                        </thead>
+                        <tbody>
+                            {% for producto in object_list %}
+                            <tr class="text-center {% if producto.stock <= 5 %}table-danger {% else %}table-default{% endif %}
+                                {% if producto.stock > 5 and producto.stock <= 10 %}table-warning {% else %}table-default{% endif %} ">
+                                <td>{{producto.codigo}}</td>
+                                <th scope="row">{{producto.nombre|striptags|safe|truncatechars:"20"}}</th>
+                                <td>{{producto.descripcion|striptags|safe|truncatechars:"15"}}</td>
+                                <th scope="col">{{producto.categoria}}</th>
+                                <td>{{producto.precioVenta}}</td>
+                                <td><span class="badge badge-success">{{producto.stock}}</span></td>
+                                <td>
+                                    {% if producto.stock > 0 %}
+                                    <button class="btn btn-warning btn-circle" 
+                                    onclick="seleccionarProducto({{producto.id}}, '{{producto.codigo}}', '{{producto.nombre}}','{{producto.stock}}' ,{{producto.precioVenta}})">
+                                        <i class="far fa-hand-pointer"></i>
+                                    </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="row">
+                    <div class="col">
+                        <button type="button" id="btnCancelar" class="btn btn-success">
+                            <!-- onclick="return cerrar_modal()" -->
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% block js %}
+
+<script>
+    $(function(){
+        $('#btnCancelar').click(function(e){
+            e.preventDefault();
+            cerrar_modal();
+        });
+    });
+    function seleccionarProducto(id, codigo, nombre, stock, precioVenta) {
+        $('#codigo').val(codigo);
+        $('#nombre').val(nombre);
+        $('#precioVenta').val(precioVenta);
+        $('#disponibles').val(stock);
+        $('#btnCancelar').click();
+        $('#codigo').select();
+        $('#cantidad').focus();
+
+    }
+    $("#tblProducto").bootstrapTable();
+</script>
+{% endblock js %}

@@ -1,0 +1,80 @@
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <div class="container ml-5">
+            <div class="row mt-3 mb-3">
+
+                <div class="col-md-9 mx-auto">
+                    {% if not obj %}
+                        <h2 class="text-success text-center mb-3">Registrar Producto</h2>
+                    {% else %}
+                        <h2 class="text-success text-center mb-3">Modificar Producto</h2>
+                    {% endif %}
+                    <br>
+                    {% if obj %}
+                    <form method="POST" role="form" class="form-inline" action="{% url 'inv:Producto_edit' obj.pk %}" >
+                    {% else %}
+                    <form method="POST" role="form" class="form-inline" action="{% url 'inv:Producto_form' %}" >
+                    {% endif %}
+
+                    {% csrf_token %}
+                        <div class="formulario">
+                            {{form.as_p}}
+                        </div>
+                        <br>
+                        <div class="col text-center">
+                            <button type="submit" class="btn btn-success mr-3" id="registrar" ><span class="fas fa-save"></span> Registrar</button>
+                            <a onclick="cerrar_modal()" href="#" class="btn btn-danger"><span class="fa fa-undo"></span> Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% block js %}
+<script>
+    $(function () {
+        $("#id_categoria").select2({
+            placeholder:"Seleccione la Categoria  ",
+            allowClear:true
+        });
+    });
+
+    $("#registrar").click(function (e) {
+        if ( $("#id_precioCompra").val() > $("#id_precioVenta").val() ){
+            e.preventDefault()
+            mensaje("ADVERTENCIA: El Precio de Venta no puede ser menor al Precio de Compra.", "red");
+            $("#id_precioVenta").focus()
+            return false
+        }
+    });
+    
+    $(function (e) {
+
+        var url = $("form").attr("action");
+        var token = jQuery("[name=csrfmiddlewaretoken]").val();
+
+        $("form").submit(function (e) {
+            e.preventDefault();
+            //alert(token);
+            var dataForm = $("form").serializeArray();
+            $.ajax({
+                url:url,
+                method : "POST",
+                headers: {'X-CSRFToken': token},
+                data: dataForm
+            })
+            .done(function (r, textStatus, xhr) {
+                if(xhr.status == 200){
+                    location.reload(true);
+                }else{
+                    mensaje(textStatus);
+                }
+            }).fail(function (error) {
+                mensaje(error.responseText, "red");
+            });
+
+        });
+    });
+</script>
+{% endblock js %} 

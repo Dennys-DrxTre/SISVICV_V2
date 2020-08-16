@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Listado de Ventas</title>
+    {% load static %}
+    <style type="text/css">
+    @page {
+        size: letter;
+        margin-top: 2cm;
+        margin-left: 2cm;
+        margin-right: 1cm;
+        margin-bottom: 2cm;
+    }
+
+    h2{
+        text-align: center;
+        padding: 1rem;
+        font-size: 16px;
+    }
+
+    h3{
+        text-align: right;
+        margin-bottom: 1rem;
+        font-size: 14px;
+
+
+    }
+    .table {
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 5px;
+        background-color: #fff;
+    }
+    .table th{
+        padding: 4px;
+        vertical-align: top;
+        border-top: 1px solid #000;
+        border-bottom: 1px solid #000;
+        text-align: center;
+        font-weight: 600;
+        font-size: 12px;
+    }
+    .table td{
+        border-bottom: 1px solid rgb(240, 240, 240);
+        padding: 4px;
+        vertical-align: top;
+        text-align: center;
+        font-size: 11px;
+    }
+    .table thead th {
+        vertical-align: bottom;
+    }
+
+    .table .table {
+        background-color: #fff;
+    }
+    .list-group {
+        display: block;
+        width: 100%;
+        list-style: none;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+    .list-group p {
+        width: 100%;
+        height: 20px;
+        line-height: 20px;
+        list-style: none;
+        font-size: 1.1em;
+    }
+    .subtitulo{
+        text-align: left;
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h2>CENTRO CLINICO VETERINARIO "SANTA BARBARA"</h4>
+                <h3 style="text-align: left;">Fecha de creación : {{today|date:"d/m/Y"}}</h3>
+                <h3>Reporte de ventas período : {{ f1|date:"d/m/Y" }} - {{ f2|date:"d/m/Y" }}</h3>
+            </div>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Mov. Nro</th>
+                        <th>Cliente</th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Monto c/u</th>
+                        <th>Descuento</th>
+                        <th>Total</th>
+                        <th>Ganancias</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in enc %}
+                    <tr>
+                        <td>{{ item.id }}</td>
+                        <td>{{ item.factura.cliente }}</td>
+                        <td>{{ item.producto }}</td>
+                        <td>{{ item.cantidad }}</td>
+                        <td>{{ item.precio }}</td>
+                        <td>{{ item.descuento }}</td>
+                        <td>{{ item.total }}</td>
+                        <td>{{ item.ganancias }}</td>
+                        <td>{{ item.factura.fecha| date:"d/m/Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,371 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block title %}Ventas{% endblock %}
+
+{% block contenido %}
+<form action="" method="post" id="frmFacturas">{% csrf_token %}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align items-center justify-content-between">
+            {% if not enc.id %}
+            {% else %}
+            <a class="btn btn-primary" target="_factura" href="{% url 'venta:Venta_Reporte' enc.id %}" >Imprimir</a>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            <div class="content">
+                <!--Sección superior-->
+                <div class="row">
+                    <!--Sección izquierda-->
+                    <div class="col-lg-6 form-group">
+                        <div class="content">
+                            <div class="row">
+                                <div class="col-lg-1">Nro</div>
+                                <div class="col-lg-3">
+                                    <input type="text" name="enc_id" id="enc_id" class="form-control" readonly>
+                                </div>
+                                <div class="col-lg-1.5 ml-5">Cliente</div>
+                                <div class="col-lg-4 form-group">
+                                    <select name="enc_cliente" id="enc_cliente" class="form-control" required>
+                                        <option value="">---Clientes---</option>
+                                        {% for items in cliente %}
+                                            <option value="{{items.pk}}">{{items.cedula}} </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-4.5 p-2">
+                                    <div class="row">
+                                        <div class="col-lg-3">Fecha</div>
+                                        <div class="col-lg-7  form-group">
+                                            <input style="margin-left: -0.6rem;" type="text" name="fecha" value="{{ enc.fecha|date:'SHORT_DATE_FORMAT'}}" id="fecha" class="form-control form-control-user" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 p-2 form-group">
+                                    <div class="row mt-2">
+                                        <div class="col-lg-4">SubTotal</div>
+                                        <div class="col-lg-6">
+                                            <input type="number" name="sub_total" id="sub_total" class="form-control text-right" value="0.00" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-lg-4">Descuento</div>
+                                        <div class="col-lg-6">
+                                            <input type="number" name="descuento" id="descuento" class="form-control text-right" value="0.00" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-lg-4">Total</div>
+                                        <div class="col-lg-6">
+                                            <input type="number" name="total" id="total" class="form-control text-right" value="0.00" disabled >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!--Fin sección izquierda-->
+
+                    <!--Seccion derecha-->
+                    <div class="col-lg-6 form-group">
+
+                        <div class="row p-2">
+                            <div class="col-lg-1">Cód</div>
+                            <div class="col-lg-3">
+                                <input type="text" name="codigo" id="codigo" class="form-control" placeholder="Cód. Producto" autocomplete="off" required>
+                            </div>
+                            <div class="col-lg-7">
+                                <input type="text" name="nombre" id="nombre" class="form-control" placeholder="Descripción" disabled required>
+                            </div>
+                            <div class="col-lg-1">
+                                <button type="button" class="btn btn-info" id="btnBuscar">
+                                    <i class="fab fa-searchengin"></i>
+                                </button>
+                            </div>
+                            <div class="col-lg-1 text-right mt-2">Disp</div>
+                            <div class="col-lg-5 mt-2">
+                                <input class="form-control" type="number" name="disponibles" id="disponibles" placeholder="Disponibles" min="1" readonly>
+                            </div>
+                            <div class="col-lg-2 text-right mt-2">Precio</div>
+                            <div class="col-lg-4 mt-2">
+                                <input type="number" name="precioVenta" id="precioVenta" class="form-control" placeholder="Precio" readonly min="1">
+                            </div> 
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-1">Cant</div>
+                            <div class="col-lg-5">
+                                <input type="number" name="cantidad" id="cantidad" class="form-control" placeholder="Cantidad" min="1" required>
+                            </div>
+                            <div class="col-lg-1">Desc</div>
+                            <div class="col-lg-4"> 
+                                <input type="text" name="descuento_detalle" id="descuento_detalle" class="form-control" placeholder="Descuento" onkeypress="return justNumbers(event);">
+                            </div>
+                            <div class="col-lg-1">
+                                <button type="submit" class="btn btn-danger" id="btnGuardar"><i class="far fa-save"></i></button>
+                            </div>
+                        </div>
+                        <div class="row p-1">
+                            <div class="col-lg-9 text-right">Sub-Total</div>
+                            <div class="col-lg-3">
+                                <input class="form-control" type="number" name="sub_total_detalle" id="sub_total_detalle" placeholder="Sub-Total" value="0.00" disabled>
+                            </div>
+                        </div>
+                        <div class="row p-1">
+                            <div class="col-lg-9 text-right">Total</div>
+                            <div class="col-lg-3">
+                                <input class="form-control" type="number" name="total_detalle" id="total_detalle" placeholder="Total" value="0.00" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <!--fin sección derecha-->
+                </div>
+                <!--Fin seccion superior-->
+                <!--Inicio Detalle-->
+                <hr>
+                <div class="row p-1">
+                    <div class="col-lg-12">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Detalle de Venta</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                            <th>Nro.</th>
+                                            <th>Código Pro.</th>
+                                            <th>Producto</th>
+                                            <th>Cantidad</th>
+                                            <th>Sub-total</th>
+                                            <th>Descuento</th>
+                                            <th>Monto</th>
+                                            <th>Ganancias</th>
+                                            <th>Fecha</th>
+                                            <th align="center">Opción</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for opt in body %}
+                                            <tr>
+                                                <td>{{ opt.id  }}</td>
+                                                <td>{{ opt.producto.codigo }}</td>
+                                                <td>{{ opt.producto.nombre }}</td>
+                                                <td>{{ opt.cantidad }}</td>
+                                                <td>{{ opt.sub_total }}</td>
+                                                <td>{{ opt.descuento }}</td>
+                                                <td>{{ opt.total }}</td>
+                                                <td>{{ opt.ganancias }}</td>
+                                                <td>{{ opt.factura.fecha|date:"d-m-Y" }}</td>
+                                                <td align="center">
+                                                    <button type="button" class="btn btn-warning btn-circle" onclick="borrar_detalle({{opt.id}})">
+                                                        <i class="fas fa-history"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}       
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% block js %}
+<script>
+    //Solo numeros
+    function justNumbers(e)
+    {
+    var keynum = window.event ? window.event.keyCode : e.which;
+    if ((keynum == 8) || (keynum == 46))
+    return true;
+        
+    return /\d/.test(String.fromCharCode(keynum));
+    }
+    // end solo numeros
+    function calcularDetalle() {
+        var cant, exist, precio, descto, total, subtotal;
+
+        exist = $("#disponibles").val();
+
+        cant = $("#cantidad").val();
+        cant = cant ==="" ? 0 : +cant;
+        cant = cant <0 ? 0 : cant;
+        cant = cant > exist ? exist: cant;
+
+
+        precio = $("#precioVenta").val();
+        precio = precio ==="" ? 0 : +precio;
+        precio = precio <0 ? 0 : precio;
+
+        descto = $("#descuento_detalle").val();
+        descto = descto ==="" ? 0 : +descto;
+        descto = descto <0 ? 0 : descto;
+
+        descto = descto > (cant * precio) ? 0: descto;
+
+        subtotal = cant * precio;
+        
+        total = subtotal - descto;
+
+        $("#cantidad").val(cant);
+        $("#precioVenta").val(precio);
+        $("#descuento_detalle").val(descto);
+
+        $("#sub_total_detalle").val(subtotal);
+        $("#total_detalle").val(total);
+    }
+    //Final de la funcion calcular total
+
+    //Funcion de buscar los productos
+    function buscarProducto(){
+        
+        if ($("#enc_cliente").val()==="" || $("#enc_cliente").val()===null){
+            mensaje("Cliente no seleccionado", "red");
+            $("#enc_cliente").focus();
+            return false;
+        }
+        var codigo = $("#codigo").val();
+        if (codigo===""){
+            return false;
+        }
+        var path = "{% url 'venta:lista' %}" + codigo;
+
+        $.ajax({
+            type:"GET",
+            url: path,
+            success: function(r){
+                if(r.stock <= 0 ){
+                    mensaje("Producto agotado", 'red');
+                    $('#codigo').val("");
+                    $('#nombre').val("");
+                    $('#precioVenta').val("");
+                    $('#disponibles').val("");
+                    $('#codigo').focus();
+                    return false;
+                }
+                $('#codigo').val(r.codigo);
+                $('#nombre').val(r.nombre);
+                $('#disponibles').val(r.stock);
+                $('#precioVenta').val(r.precioVenta);
+                $('#cantidad').focus();
+            },
+            error: function(a,b,c){
+                if(a.status==404){
+                    mensaje("Producto -"+ codigo + "- no encontrado", 'red');
+                    $('#codigo').val("");
+                    $('#nombre').val("");
+                    $('#disponibles').val("");
+                    $('#precioVenta').val("");
+                    $('#codigo').focus();
+                }
+            }
+        });
+        
+    }
+
+    $(function() {
+        $('#sidebarToggle').click();
+        $("#enc_cliente").select2({
+            placeholder: 'Selecciona un Cliente',
+            allowClear: true
+        });
+
+        $('#btnBuscar').click(function(e){
+            if ($('#enc_cliente').val()===""){
+                mensaje("Selecciona un Cliente", "red");
+                return false
+            }
+            abrir_modal("{% url 'venta:lista_popup' %}")
+        });
+
+        $("#codigo").keypress(function (e) {
+            if (e.keyCode === 13){
+                e.preventDefault();
+                buscarProducto();
+            }
+        });
+
+        $('#cantidad,#precioVenta,#descuento_detalle').change(function(){
+            calcularDetalle();
+        });
+
+        $("#enc_id").val({{enc.id}});
+        $("#enc_cliente").val("{{enc.cliente.pk}}").change();
+        $("#fecha").val('{{enc.fecha|date:'SHORT_DATE_FORMAT'}}');
+        $("#sub_total").val({{enc.sub_total}});
+        $("#descuento").val({{enc.descuento}});
+        $("#total").val({{enc.total}});
+
+    });
+
+    function borrar_detalle(id) {
+        $.confirm({
+            theme : 'modern',
+            icon: 'fab fa-keycdn',
+            type: 'red',
+            title: 'Confirmación Requerida',
+            content: 'url:/ventas/factura/borrar-detalle/' + id,
+
+            onContentReady: function(){
+                var self = this;
+                this.$content.find('#usuario').val('{{user.username}}');
+                this.$content.find('#usuario').select();
+                this.$content.find('#usuario').focus();
+                    
+            },
+            buttons:{
+                borrar:{
+                    text: "Borrar",
+                    btnClass: "btn btn-danger",
+                    action: function(){
+                        var user =  this.$content.find('input#usuario');
+                        var pass = this.$content.find('input#password');
+
+                        if (!user.val().trim()){
+                            mensaje("Usuario Requerido", "red");
+                            return false;
+                        }
+                        if (!pass.val().trim()){
+                            mensaje("Contraseña Requerida", "red");
+                            return false;
+                        }
+
+                        var data = {"user": user.val(), "pass": pass.val()};
+                        var token = '{{csrf_token}}';
+                        $.ajax({
+                            headers: {"X-CSRFToken": token},
+                            type : 'POST',
+                            data: data,
+                            url: '/ventas/factura/borrar-detalle/' + id,
+                            success: function(r){
+                                if (r==="ok"){
+                                    location.reload(true);
+                                }else{
+                                    mensaje(r, 'red');
+                                }
+                                
+                            },
+                            error: function(a,b,c){
+                                mensaje(c);
+                            }
+                        });
+                    }
+                },
+                cancelar: function(){}
+            }
+        });
+    }
+
+</script>
+
+{% endblock js %}
+
+{% endblock contenido %}

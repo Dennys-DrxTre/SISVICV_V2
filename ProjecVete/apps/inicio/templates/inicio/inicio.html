@@ -1,0 +1,247 @@
+{% extends "base/base.html" %}
+{% block title %}Inicio | Santa Barbara{% endblock %}
+{% block contenido %}
+
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+      <!--<h1 class="h3 mb-0 text-gray-800 font-weight-bold">Estados</h1>-->
+    </div>
+
+    <!-- Content Row -->
+    <div class="row">
+        <!-- Earnings (Monthly) Card Example -->
+      <div class="col-xl-3 col-md-4 mb-4">
+        <div class="card border-left-primary shadow h-100 py-1">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Ganancias ({% for f in fecha.all %} {% if forloop.last %} {{ f.month|date:"F" }} {% endif %}{% endfor %})</div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                  {% for fechas in fecha.all %}
+                    {% if forloop.last %}
+                      {{fechas.month|date:"m/Y"}} : {{fechas.ganancias}} $
+                    {% endif %}
+                  {% empty %}
+                    000.00 $
+                  {% endfor %}
+                </div>
+              </div>
+              <div class="col-auto">
+                <i class="fas fa-search-dollar fa-2x text-primary"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ventas (Monthly) Card Example -->
+      <div class="col-xl-3 col-md-4 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Ganancias (Global)</div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                  {% if total.ganancias__sum %} 
+                    {{total.ganancias__sum}} $
+                    {% else %}
+                    000.00 $
+                  {% endif %}
+                </div>
+              </div>
+              <div class="col-auto">
+                <i class="fas fa-dollar-sign fa-2x text-warning"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-md-4 mb-4">
+        <div class="card border-left-danger shadow h-100 py-1">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Productos (Activos)</div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                  {% if prod %}
+                    {{prod|length}}
+                  {% else %}
+                    0
+                  {% endif %}
+                </div>
+              </div>
+              <div class="col-auto">
+                <i class="fas fa-prescription-bottle fa-2x text-danger"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-md-4 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Mascotas (Activos)</div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                  {% if contmascot %}
+                    {{contmascot|length}}
+                  {% else %}
+                    0
+                  {% endif %}
+                </div>
+              </div>
+              <div class="col-auto">
+                <i class="fas fa-dog fa-2x text-success"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Los ultimos 5 movimientos de las Ventas  -->
+    <div class="card shadow mb-4">
+      <a href="#collapseCardExample3" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+        <h6 class="m-0 font-weight-bold text-danger">Últimos 5 Registros de Ventas</h6>
+      </a>
+      <div class="collapse show" id="collapseCardExample3">
+        <div class="card-body">
+          <table class="table table-hover">
+            <thead>
+              <tr class="table bg-danger text-gray-100">
+                <th>Cliente</th>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Sub-Total</th>
+                <th>Descuento</th>
+                <th>Total</th>
+                <th>Ganancia</th>
+                <th>Fecha</th>
+              </tr>
+            </thead>
+            <tbody>
+                {% for ventas in venta %}
+                {% if forloop.counter <= 5 %}
+                <tr >
+                    <td>{{ ventas.factura.cliente.nombre }}</td>
+                    <td>{{ ventas.producto }}</td>
+                    <td>{{ ventas.cantidad }}</td>
+                    <td>{{ ventas.sub_total }} $</td>
+                    <td>{{ ventas.descuento }} $</td>
+                    <td>{{ ventas.total }} $</td>
+                    <td>{{ ventas.ganancias }}</td>
+                    <td>{{ ventas.factura.fecha|date:"d-m-Y" }}</td>
+                  </tr>
+                {% endif %}
+                {% empty %}
+                <td>---------------------</td>
+                <td>---------------------</td>
+                <td>---------------------</td>
+                <td>---------------------</td>
+                <td>---------------------</td>
+                {% endfor %}
+            </tbody>
+          </table> 
+        </div>
+      </div>
+    </div>
+
+    <!-- Los ultimos 5 movimientos de los clientes  -->
+    <!-- Collapsable Card Example -->
+    <div class="card shadow mb-4">
+      <!-- Card Header - Accordion -->
+      <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+        <h6 class="m-0 font-weight-bold text-primary">Últimos 5 Registros de Clientes</h6>
+      </a>
+      <!-- Card Content - Collapse -->
+      <div class="collapse show" id="collapseCardExample">
+        <div class="card-body">
+          <table class="table table-hover">
+            <thead>
+              <tr class="table bg-primary text-gray-100">
+                <th>Cedula</th>
+                <th>Nombres y Apellidos</th>
+                <th>Movil</th>
+                <th>Telefóno</th>
+                <th>Correo</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+                {% for cliente in cliente %}
+                {% if forloop.counter <= 5 %}
+              <tr >
+                <td>{{cliente.tipo}}{{ cliente.cedula }}</td>
+                <td>{{cliente.nombre}} {{cliente.apellido}}</td>
+                <td>{{cliente.co_movil}}{{ cliente.movil }}</td>
+                <td>{{cliente.co_fijo}}{{ cliente.tlf }}</td>
+                <td>{% if not cliente.correo %}No Posee{% else %}{{ cliente.correo }}{% endif %}</td>
+                <td>{{ cliente.estado|yesno:"Activo,Inactivo" }}</td>
+              </tr>
+              {% endif %}
+              {% empty %}
+              <td>---------------------</td>
+              <td>---------------------</td>
+              <td>---------------------</td>
+              <td>---------------------</td>
+              <td>---------------------</td>
+              <td>---------------------</td>
+              {% endfor %}
+            </tbody>
+          </table> 
+        </div>
+      </div>
+    </div>
+
+    <!-- Los ultimos 5 movimientos de las mascotas  -->
+    <div class="card shadow mb-4">
+      <a href="#collapseCardExample2" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+        <h6 class="m-0 font-weight-bold text-success">Últimos 5 Registros de Mascotas</h6>
+      </a>
+      <div class="collapse show" id="collapseCardExample2">
+        <div class="card-body">
+          <table class="table table-hover">
+            <thead>
+              <tr class="table bg-success text-gray-100">
+                <th>Cliente</th>
+                <th>Mascota</th>
+                <th>Sexo</th>
+                <th>Especie</th>
+                <th>Raza</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+                {% for mascotas in mascota %}
+                {% if forloop.counter <= 5 %}
+                <tr >
+                    <td>{{ mascotas.cliente }}</td>
+                    <td>{{ mascotas.nombre }}</td>
+                    <td>{{ mascotas.sexom }}</td>
+                    <td>{{ mascotas.especie }}</td>
+                    <td>{{ mascotas.razam }}</td>
+                    <td>{{ mascotas.estado|yesno:"Activo,Inactivo" }}</td>
+                  </tr>
+                {% endif %}
+                {% empty %}
+                <td>---------------------</td>
+                <td>---------------------</td>
+                <td>---------------------</td>
+                <td>---------------------</td>
+                <td>---------------------</td>
+                <td>---------------------</td>
+                {% endfor %}
+            </tbody>
+          </table> 
+        </div>
+      </div>
+    </div>
+
+</div>
+{% endblock contenido %}
