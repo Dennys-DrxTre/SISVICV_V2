@@ -85,9 +85,12 @@ def Estadisticas(request):
     cantidad = FacturaHeader.objects.annotate(month=TruncMonth('fecha')).values('month').annotate(cantidad=Count('id'))
     if len(cantidad) < (12):
         cantidad = FacturaHeader.objects.annotate(month=TruncMonth('fecha')).values('month').annotate(cantidad=Count('id'))
+        print(cantidad)
     else: 
         result2 = len(cantidad) - int(12)
         cantidad = FacturaHeader.objects.annotate(month=TruncMonth('fecha')).values('month').annotate(cantidad=Count('id'))[result2:]
+        print(cantidad)
+
 #DONUT CHART CANTIDAD TOTAL DE CONSULTAS, VACUNACIONES Y DESPARASITACIONES
     consulta = Consulta.objects.aggregate(Count('id'))
     desparasitacion = Despa.objects.aggregate(Count('id'))
